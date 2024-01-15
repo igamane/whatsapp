@@ -72,6 +72,7 @@ const sendMultipleImages = async (phone_no_id, token, recipientNumber) => {
                 }
             });
             console.log(`Message sent successfully: Image URL - ${imageUrl}`);
+            return('the images have been sent successfully, inform the client that you have sent the property images to take a look')
         } catch (error) {
             console.error(`Error sending image ${imageUrl}:`, error);
         // Logging the error for the specific image URL
@@ -106,7 +107,9 @@ const sendMapUrl = async (phone_no_id, recipientNumber, token, mapUrl) => {
     }
 };
 
-const getAssistantResponse = async function(prompt) {
+// await sendMapUrl(phone_no_id, from, token, mapUrl)
+
+const getAssistantResponse = async function(prompt, phone_no_id, token, recipientNumber) {
     const thread = await openai.beta.threads.create();
 
     console.log(thread.id);
@@ -134,10 +137,38 @@ const getAssistantResponse = async function(prompt) {
             console.log(runStatus.status);
             if (runStatus.status === "completed") {
                 break; // Exit the loop if the run status is completed
-            }
+            } else if (runStatus.status === 'requires_action') {
+                console.log("Requires action");
+            
+                const requiredActions = runStatus.required_action.submit_tool_outputs.tool_calls;
+                console.log(requiredActions);
+            
+                let toolsOutput = [];
+            
+                for (const action of requiredActions) {
+                    const funcName = action.function.name;
+                    
+                    if (funcName === "sendMultipleImages") {
+                        const output = await sendMultipleImages(phone_no_id, token, recipientNumber);
+                        toolsOutput.push({
+                            tool_call_id: action.id,
+                            output: JSON.stringify(output)  
+                        });
+                    } else {
+                        console.log("Function not found");
+                    }
+                }
+            
+                // Submit the tool outputs to Assistant API
+                await openai.beta.threads.runs.submitToolOutputs(
+                    thread.id,
+                    run.id,
+                    { tool_outputs: toolsOutput }
+                );
+            } 
             console.log("Run is not completed yet.");
             await delay(1000); // Wait for 1 second before checking again
-        }
+        } 
         let messages = await openai.beta.threads.messages.list(threadId);
         console.log("messages", messages)
         return messages.data[0].content[0].text.value
@@ -153,6 +184,53 @@ const getAssistantResponse = async function(prompt) {
     return await checkStatusAndPrintMessages(thread.id, run.id);
 
 } 
+// const getAssistantResponse = async function(prompt) {
+//     const thread = await openai.beta.threads.create();
+
+//     console.log(thread.id);
+    
+//     const message = await openai.beta.threads.messages.create(
+//         thread.id,
+//         {
+//             role: "user",
+//             content: prompt
+//         }
+//         );
+        
+//         const run = await openai.beta.threads.runs.create(
+//             thread.id,
+//             { 
+//                 assistant_id: assistantId,
+//             }
+//             );
+            
+//     console.log(run.id);
+//     const checkStatusAndPrintMessages = async (threadId, runId) => {
+//         let runStatus;
+//         while (true) {
+//             runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
+//             console.log(runStatus.status);
+//             if (runStatus.status === "completed") {
+//                 break; // Exit the loop if the run status is completed
+//             }
+//             console.log("Run is not completed yet.");
+//             await delay(1000); // Wait for 1 second before checking again
+//         }
+//         let messages = await openai.beta.threads.messages.list(threadId);
+//         console.log("messages", messages)
+//         return messages.data[0].content[0].text.value
+//     };
+  
+//     function delay(ms) {
+//       return new Promise((resolve) => {
+//           setTimeout(resolve, ms);
+//       });
+//     }
+  
+//     // Call checkStatusAndPrintMessages function
+//     return await checkStatusAndPrintMessages(thread.id, run.id);
+
+// } 
 
 app.post("/webhook", async (req, res) => { // I want some [text cut off]    
     let body_param = req.body;
@@ -169,27 +247,27 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
             let from = body_param.entry[0].changes[0].value.messages[0].from;
             let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
-            // let assistantResponse = await getAssistantResponse(msg_body);
+            let assistantResponse = await getAssistantResponse(msg_body);
 
-            // console.log("assistantR?esponse", assistantResponse);
+            console.log("assistantR?esponse", assistantResponse);
 
-            await sendMapUrl(phone_no_id, from, token, mapUrl)
+            
             
 
-            // axios({
-            //     method: "POST",
-            //     url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
-            //     data: {
-            //         messaging_product: "whatsapp",
-            //         to: from,
-            //         text: {
-            //             body: assistantResponse
-            //         }
-            //     },
-            //     headers: {
-            //         "Content-Type": "application/json"
-            //     }
-            // });
+            axios({
+                method: "POST",
+                url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
+                data: {
+                    messaging_product: "whatsapp",
+                    to: from,
+                    text: {
+                        body: assistantResponse
+                    }
+                },
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
             
             res.sendStatus(200);
         } else {
