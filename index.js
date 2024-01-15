@@ -38,14 +38,14 @@ app.get("/webhook", (req, res) => {
     }
 });
 
-const getAssistantResponse = async function(message) {
+const getAssistantResponse = async function(prompt) {
     const thread = await openai.beta.threads.create();
 
     const message = await openai.beta.threads.messages.create(
         thread.id,
         {
           role: "user",
-          content: message
+          content: prompt
         }
       );
 
