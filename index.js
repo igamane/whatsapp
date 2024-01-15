@@ -72,13 +72,13 @@ const sendMultipleImages = async (phone_no_id, token, recipientNumber) => {
                 }
             });
             console.log(`Message sent successfully: Image URL - ${imageUrl}`);
-            return('the images have been sent successfully, inform the client that you have sent the property images to take a look')
         } catch (error) {
             console.error(`Error sending image ${imageUrl}:`, error);
-        // Logging the error for the specific image URL
-        console.error(`Error sending image ${imageUrl}:`, error);
+            // Logging the error for the specific image URL
+            console.error(`Error sending image ${imageUrl}:`, error);
+        }
     }
-}
+    return('the images have been sent successfully, inform the client that you have sent the property images to take a look')
 }
 
 // await sendMultipleImages(phone_no_id, token, from);
