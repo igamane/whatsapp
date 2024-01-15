@@ -1,7 +1,7 @@
 const express = require("express");
 const body_parser = require("body-parser");
 const axios = require("axios");
-const openai = require("openai");
+const OpenAI = require("openai");
 
 require("dotenv").config();
 
