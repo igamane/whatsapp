@@ -101,7 +101,7 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
             let from = body_param.entry[0].changes[0].value.messages[0].from;
             let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
-            let assistantResponse = await getAssistantResponse(msg_body);
+            // let assistantResponse = await getAssistantResponse(msg_body);
 
             console.log("assistantResponse", assistantResponse);
 
@@ -111,6 +111,7 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
                 data: {
                     messaging_product: "whatsapp",
                     to: from,
+                    type: "image",
                     image: {
                         link: "https://res.cloudinary.com/di5lcdswr/image/upload/v1705344100/PHOTO-2021-10-19-10-47-56_9_eiefzl.jpg"
                     }
