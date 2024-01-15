@@ -22,8 +22,10 @@ app.get("/webhook", (req, res) => {
     console.log(mode);
     console.log(challenge);
     console.log(token);
+    console.log(mytoken);
     
     if (mode && token) {
+        console.log("&");
         if (mode === "subscribe" && token === mytoken) {
             console.log("hello get");
             res.status(200).send(challenge);
@@ -43,8 +45,8 @@ app.post("/webhook", (req, res) => { // I want some [text cut off]
     if(body_param.object){
         if(body_param.entry &&
            body_param.entry[0].changes &&
-           body_param.entry[0].changes[0].value.message &&
-           body_param.entry[0].changes[0].value.message[0]
+           body_param.entry[0].changes[0].value.messages &&
+           body_param.entry[0].changes[0].value.messages[0]
         ){
             let phone_no_id = body_param.entry[0].changes[0].value.metadata.phone_number_id;
             let from = body_param.entry[0].changes[0].value.messages[0].from;
