@@ -102,6 +102,7 @@ const sendMapUrl = async (phone_no_id, recipientNumber, token, mapUrl) => {
             }
         });
         console.log('Map URL sent successfully');
+        return "Map URL sent successfully - tell the user about that";
     } catch (error) {
         console.error('Error sending map URL:', error);
     }
@@ -150,6 +151,12 @@ const getAssistantResponse = async function(prompt, phone_no_id, token, recipien
                     
                     if (funcName === "sendMultipleImages") {
                         const output = await sendMultipleImages(phone_no_id, token, recipientNumber);
+                        toolsOutput.push({
+                            tool_call_id: action.id,
+                            output: JSON.stringify(output)  
+                        });
+                    } else if (funcName === "sendMapUrl") {
+                        const output = await sendMapUrl(phone_no_id, recipientNumber, token, mapUrl);
                         toolsOutput.push({
                             tool_call_id: action.id,
                             output: JSON.stringify(output)  
