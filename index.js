@@ -110,9 +110,54 @@ const sendMapUrl = async (phone_no_id, token, recipientNumber, mapUrl) => {
 
 // await sendMapUrl(phone_no_id, from, token, mapUrl)
 
-const getAssistantResponse = async function(prompt, phone_no_id, token, recipientNumber) {
-    const thread = await openai.beta.threads.create();
+async function getOrCreateThreadId(phoneNumber) {
+    let usersThreads;
+    try {
+      // Read the file synchronously
+      const data = fs.readFileSync('users_threads.json');
+      usersThreads = JSON.parse(data);
+    } catch (err) {
+      // Handle errors (e.g., file not found)
+      console.error('Error reading file:', err);
+      return null;
+    }
+  
+    // Check if the phone number is already in the file
+    const existingThread = usersThreads.find(user => user['customer phone number'] === phoneNumber);
+    if (existingThread) {
+      return existingThread['thread id'];
+    }
+  
+    // Create a new thread id
+    const newThreadId = await openai.beta.threads.create();
+  
+    // Add the new thread to the usersThreads array
+    usersThreads.push({ 'customer phone number': phoneNumber, 'thread id': newThreadId });
+  
+    // Save the updated array back to the file
+    try {
+      fs.writeFileSync('users_threads.json', JSON.stringify(usersThreads, null, 2));
+    } catch (err) {
+      // Handle errors (e.g., unable to write to file)
+      console.error('Error writing file:', err);
+      return null;
+    }
+  
+    return newThreadId;
+  }
 
+const getAssistantResponse = async function(prompt, phone_no_id, token, recipientNumber) {
+    const thread = await getOrCreateThreadId(recipientNumber);
+
+    console.log(thread.id);
+    console.log(thread.id);
+    console.log(thread.id);
+    console.log(thread.id);
+    console.log(thread.id);
+    console.log(thread.id);
+    console.log(thread.id);
+    console.log(thread.id);
+    console.log(thread.id);
     console.log(thread.id);
     
     const message = await openai.beta.threads.messages.create(
