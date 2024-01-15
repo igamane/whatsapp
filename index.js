@@ -14,13 +14,15 @@ app.listen(8000||process.env.PORT, () => {
 
 
 app.get("/webhook", (req, res) => {
-    console.log("hello");
+    console.log("hello get");
     let mode = req.query["hub.mode"];
     let challenge = req.query["hub.challenge"];
     let token = req.query["hub.verify_token"];
-
+    console.log("hello get");
+    
     if (mode && token) {
         if (mode === "subscribe" && token === mytoken) {
+            console.log("hello get");
             res.status(200).send(challenge);
         } else {
             res.status(403);
@@ -29,7 +31,7 @@ app.get("/webhook", (req, res) => {
 });
 
 app.post("/webhook", (req, res) => { // I want some [text cut off]
-    console.log("hello");
+    console.log("hello post");
     
     let body_param = req.body;
     
