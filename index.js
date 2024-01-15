@@ -41,25 +41,29 @@ app.get("/webhook", (req, res) => {
 const getAssistantResponse = async function(prompt) {
     const thread = await openai.beta.threads.create();
 
+    console.log(thread.id);
+    
     const message = await openai.beta.threads.messages.create(
         thread.id,
         {
-          role: "user",
-          content: prompt
+            role: "user",
+            content: prompt
         }
-      );
-
-    const run = await openai.beta.threads.runs.create(
-        thread.id,
-        { 
-          assistant_id: assistantId,
-        }
-    );
-
+        );
+        
+        const run = await openai.beta.threads.runs.create(
+            thread.id,
+            { 
+                assistant_id: assistantId,
+            }
+            );
+            
+    console.log(run.id);
     const checkStatusAndPrintMessages = async (threadId, runId) => {
         let runStatus;
         while (true) {
             runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
+            console.log(runStatus.status);
             if (runStatus.status === "completed") {
                 break; // Exit the loop if the run status is completed
             }
@@ -97,6 +101,8 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
             let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
             let assistantResponse = await getAssistantResponse(msg_body);
+
+            console.log("assistantResponse", assistantResponse);
 
             axios({
                 method: "POST",
