@@ -83,7 +83,7 @@ const sendMultipleImages = async (phone_no_id, token, recipientNumber) => {
 
 // await sendMultipleImages(phone_no_id, token, from);
 
-const sendMapUrl = async (phone_no_id, recipientNumber, token, mapUrl) => {
+const sendMapUrl = async (phone_no_id, token, recipientNumber, mapUrl) => {
     try {
         await axios({
             method: "POST",
@@ -143,27 +143,42 @@ const getAssistantResponse = async function(prompt, phone_no_id, token, recipien
             
                 const requiredActions = runStatus.required_action.submit_tool_outputs.tool_calls;
                 console.log(requiredActions);
+
+                // Dispatch table
+                const dispatchTable = {
+                    "sendMultipleImages": sendMultipleImages,
+                    "sendMapUrl": sendMapUrl
+                };
             
                 let toolsOutput = [];
             
                 for (const action of requiredActions) {
                     const funcName = action.function.name;
-                    
-                    if (funcName === "sendMultipleImages") {
-                        const output = await sendMultipleImages(phone_no_id, token, recipientNumber);
-                        toolsOutput.push({
-                            tool_call_id: action.id,
-                            output: JSON.stringify(output)  
-                        });
-                    } else if (funcName === "sendMapUrl") {
-                        const output = await sendMapUrl(phone_no_id, recipientNumber, token, mapUrl);
-                        toolsOutput.push({
-                            tool_call_id: action.id,
-                            output: JSON.stringify(output)  
-                        });
+
+                    if (dispatchTable[funcName]) {
+                        try {
+                            const output = await dispatchTable[funcName](phone_no_id, token, recipientNumber, ...Object.values(functionArguments));
+                            toolsOutput.push({ tool_call_id: action.id, output: JSON.stringify(output) });
+                        } catch (error) {
+                            console.log(`Error executing function ${funcName}: ${error}`);
+                        }
                     } else {
                         console.log("Function not found");
                     }
+                    
+                    // if (funcName === "sendMultipleImages") {
+                    //     const output = await sendMultipleImages(phone_no_id, token, recipientNumber);
+                    //     toolsOutput.push({
+                    //         tool_call_id: action.id,
+                    //         output: JSON.stringify(output)  
+                    //     });
+                    // } else if (funcName === "sendMapUrl") {
+                    //     const output = await sendMapUrl(phone_no_id, recipientNumber, token, mapUrl);
+                    //     toolsOutput.push({
+                    //         tool_call_id: action.id,
+                    //         output: JSON.stringify(output)  
+                    //     });
+                    // } 
                 }
             
                 // Submit the tool outputs to Assistant API
