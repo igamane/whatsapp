@@ -247,7 +247,7 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
             let from = body_param.entry[0].changes[0].value.messages[0].from;
             let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
-            let assistantResponse = await getAssistantResponse(msg_body);
+            let assistantResponse = await getAssistantResponse(msg_body, phone_no_id, token, from);
 
             console.log("assistantR?esponse", assistantResponse);
 
