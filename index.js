@@ -16,6 +16,19 @@ const openai = new OpenAI({
     apiKey: apiKey, // Replace with your OpenAI API key
 });
 
+const imageUrls = [
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344722/PHOTO-2021-10-19-10-47-56_drwkuk.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344722/PHOTO-2021-10-19-10-47-56_2_soq39w.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344722/PHOTO-2021-10-19-10-47-56_1_dvdnc4.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344722/PHOTO-2021-10-19-10-47-56_3_g2miyt.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344721/PHOTO-2021-10-19-10-47-56_4_mvznw7.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344721/PHOTO-2021-10-19-10-47-56_5_nixozh.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344721/PHOTO-2021-10-19-10-47-56_8_bbzozr.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344721/PHOTO-2021-10-19-10-47-56_6_iijfw5.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344721/PHOTO-2021-10-19-10-47-56_7_yca55k.jpg',
+    'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344721/PHOTO-2021-10-19-10-47-56_9_cxiuul.jpg'
+];
+
 
 app.listen(8000||process.env.PORT, () => {
     console.log("webhook is listening");
@@ -37,6 +50,33 @@ app.get("/webhook", (req, res) => {
         }
     }
 });
+
+const sendMultipleImages = async (phone_no_id, token, recipientNumber) => {
+    for (const imageUrl of imageUrls) {
+        try {
+            await axios({
+                method: "POST",
+                url: `https://graph.facebook.com/v13.0/${phone_no_id}/messages?access_token=${token}`,
+                data: {
+                    messaging_product: "whatsapp",
+                    to: recipientNumber,
+                    type: "image",
+                    image: {
+                        link: imageUrl
+                    }
+                },
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            console.log(`Message sent successfully: Image URL - ${imageUrl}`);
+        } catch (error) {
+            console.error(`Error sending image ${imageUrl}:`, error);
+        // Logging the error for the specific image URL
+        console.error(`Error sending image ${imageUrl}:`, error);
+    }
+}
+}
 
 const getAssistantResponse = async function(prompt) {
     const thread = await openai.beta.threads.create();
@@ -105,21 +145,22 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
 
             // console.log("assistantR?esponse", assistantResponse);
 
-            axios({
-                method: "POST",
-                url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
-                data: {
-                    messaging_product: "whatsapp",
-                    to: from,
-                    type: "image",
-                    image: {
-                        link: "https://res.cloudinary.com/di5lcdswr/image/upload/v1705344100/PHOTO-2021-10-19-10-47-56_9_eiefzl.jpg"
-                    }
-                },
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
+            await sendMultipleImages(phone_no_id, token, from);
+
+            // axios({
+            //     method: "POST",
+            //     url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
+            //     data: {
+            //         messaging_product: "whatsapp",
+            //         to: from,
+            //         text: {
+            //             body: assistantResponse
+            //         }
+            //     },
+            //     headers: {
+            //         "Content-Type": "application/json"
+            //     }
+            // });
             
             res.sendStatus(200);
         } else {
