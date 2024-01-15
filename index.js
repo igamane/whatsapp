@@ -1,7 +1,7 @@
 const express = require("express");
 const body_parser = require("body-parser");
 const axios = require("axios");
-require("dotenv"),config();
+require("dotenv").config();
 
 const app = express().use(body_parser.json());
 
@@ -66,3 +66,7 @@ app.post("/webhook", (req, res) => { // I want some [text cut off]
     }
     // Additional code may be needed here to complete the response
 });
+
+app.get("/", (req, res) =>{
+    res.status(200).send("hello bro");
+})
