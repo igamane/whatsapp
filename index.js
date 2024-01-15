@@ -14,6 +14,7 @@ app.listen(8000||process.env.PORT, () => {
 
 
 app.get("/webhook", (req, res) => {
+    console.log("hello");
     let mode = req.query["hub.mode"];
     let challenge = req.query["hub.challenge"];
     let token = req.query["hub.verify_token"];
@@ -28,6 +29,7 @@ app.get("/webhook", (req, res) => {
 });
 
 app.post("/webhook", (req, res) => { // I want some [text cut off]
+    console.log("hello");
     
     let body_param = req.body;
     
