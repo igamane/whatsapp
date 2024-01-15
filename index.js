@@ -78,6 +78,8 @@ const sendMultipleImages = async (phone_no_id, token, recipientNumber) => {
 }
 }
 
+// await sendMultipleImages(phone_no_id, token, from);
+
 const getAssistantResponse = async function(prompt) {
     const thread = await openai.beta.threads.create();
 
@@ -141,26 +143,26 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
             let from = body_param.entry[0].changes[0].value.messages[0].from;
             let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
-            // let assistantResponse = await getAssistantResponse(msg_body);
+            let assistantResponse = await getAssistantResponse(msg_body);
 
-            // console.log("assistantR?esponse", assistantResponse);
+            console.log("assistantR?esponse", assistantResponse);
 
-            await sendMultipleImages(phone_no_id, token, from);
+            
 
-            // axios({
-            //     method: "POST",
-            //     url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
-            //     data: {
-            //         messaging_product: "whatsapp",
-            //         to: from,
-            //         text: {
-            //             body: assistantResponse
-            //         }
-            //     },
-            //     headers: {
-            //         "Content-Type": "application/json"
-            //     }
-            // });
+            axios({
+                method: "POST",
+                url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
+                data: {
+                    messaging_product: "whatsapp",
+                    to: from,
+                    text: {
+                        body: assistantResponse
+                    }
+                },
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
             
             res.sendStatus(200);
         } else {
