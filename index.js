@@ -2,6 +2,7 @@ const express = require("express");
 const body_parser = require("body-parser");
 const axios = require("axios");
 const OpenAI = require("openai");
+const fs = require('fs');
 
 require("dotenv").config();
 
