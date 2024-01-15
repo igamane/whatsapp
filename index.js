@@ -1,12 +1,21 @@
 const express = require("express");
 const body_parser = require("body-parser");
 const axios = require("axios");
+const openai = require("openai");
+
 require("dotenv").config();
 
 const app = express().use(body_parser.json());
 
 const token = process.env.TOKEN;
 const mytoken = process.env.MYTOKEN
+const apiKey = process.env.OPENAI_API_KEY
+const assistantId = process.env.ASSISTANT_ID
+
+const openai = new OpenAI({
+    apiKey: apiKey, // Replace with your OpenAI API key
+});
+
 
 app.listen(8000||process.env.PORT, () => {
     console.log("webhook is listening");
@@ -14,15 +23,9 @@ app.listen(8000||process.env.PORT, () => {
 
 
 app.get("/webhook", (req, res) => {
-    console.log("hello get");
     let mode = req.query["hub.mode"];
     let challenge = req.query["hub.challenge"];
     let token = req.query["hub.verify_token"];
-    console.log("hello get");
-    console.log(mode);
-    console.log(challenge);
-    console.log(token);
-    console.log(mytoken);
     
     if (mode && token) {
         console.log("&");
@@ -35,9 +38,50 @@ app.get("/webhook", (req, res) => {
     }
 });
 
-app.post("/webhook", (req, res) => { // I want some [text cut off]
-    console.log("hello post");
-    
+const getAssistantResponse = async function(message) {
+    const thread = await openai.beta.threads.create();
+
+    const message = await openai.beta.threads.messages.create(
+        thread.id,
+        {
+          role: "user",
+          content: message
+        }
+      );
+
+    const run = await openai.beta.threads.runs.create(
+        thread.id,
+        { 
+          assistant_id: assistantId,
+        }
+    );
+
+    const checkStatusAndPrintMessages = async (threadId, runId) => {
+        let runStatus;
+        while (true) {
+            runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
+            if (runStatus.status === "completed") {
+                break; // Exit the loop if the run status is completed
+            }
+            console.log("Run is not completed yet.");
+            await delay(1000); // Wait for 1 second before checking again
+        }
+        let messages = await openai.beta.threads.messages.list(threadId);
+        return messages.data[0].content[0].text.value
+    };
+  
+    function delay(ms) {
+      return new Promise((resolve) => {
+          setTimeout(resolve, ms);
+      });
+    }
+  
+    // Call checkStatusAndPrintMessages function
+    checkStatusAndPrintMessages(thread.id, run.id);
+
+} 
+
+app.post("/webhook", (req, res) => { // I want some [text cut off]    
     let body_param = req.body;
     
     console.log(JSON.stringify(body_param, null, 2));
@@ -52,6 +96,8 @@ app.post("/webhook", (req, res) => { // I want some [text cut off]
             let from = body_param.entry[0].changes[0].value.messages[0].from;
             let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
+            let assistantResponse = getAssistantResponse(msg_body);
+
             axios({
                 method: "POST",
                 url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
@@ -59,7 +105,7 @@ app.post("/webhook", (req, res) => { // I want some [text cut off]
                     messaging_product: "whatsapp",
                     to: from,
                     text: {
-                        body: "Hi.. I'm Prasath"
+                        body: assistantResponse
                     }
                 },
                 headers: {
