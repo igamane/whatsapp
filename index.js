@@ -71,6 +71,7 @@ const getAssistantResponse = async function(prompt) {
             await delay(1000); // Wait for 1 second before checking again
         }
         let messages = await openai.beta.threads.messages.list(threadId);
+        console.log("messages", messages)
         return messages.data[0].content[0].text.value
     };
   
@@ -81,7 +82,7 @@ const getAssistantResponse = async function(prompt) {
     }
   
     // Call checkStatusAndPrintMessages function
-    checkStatusAndPrintMessages(thread.id, run.id);
+    return await checkStatusAndPrintMessages(thread.id, run.id);
 
 } 
 
