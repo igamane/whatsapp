@@ -112,7 +112,7 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
                     messaging_product: "whatsapp",
                     to: from,
                     image: {
-                        link: "./catalogue/image.jpg"
+                        link: "https://res.cloudinary.com/di5lcdswr/image/upload/v1705344100/PHOTO-2021-10-19-10-47-56_9_eiefzl.jpg"
                     }
                 },
                 headers: {
