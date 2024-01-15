@@ -29,6 +29,8 @@ const imageUrls = [
     'https://res.cloudinary.com/di5lcdswr/image/upload/v1705344721/PHOTO-2021-10-19-10-47-56_9_cxiuul.jpg'
 ];
 
+const mapUrl = 'https://maps.app.goo.gl/4k8YVGdaEBsiKntL8?g_st=ic';
+
 
 app.listen(8000||process.env.PORT, () => {
     console.log("webhook is listening");
@@ -79,6 +81,30 @@ const sendMultipleImages = async (phone_no_id, token, recipientNumber) => {
 }
 
 // await sendMultipleImages(phone_no_id, token, from);
+
+const sendMapUrl = async (phone_no_id, recipientNumber, token, mapUrl) => {
+    try {
+        await axios({
+            method: "POST",
+            url: `https://graph.facebook.com/v13.0/${phone_no_id}/messages?access_token=${token}`,
+            data: {
+                messaging_product: "whatsapp",
+                to: recipientNumber,
+                type: "text",
+                text: {
+                    preview_url: true, // Enable link preview
+                    body: mapUrl // The URL you want to send
+                }
+            },
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        console.log('Map URL sent successfully');
+    } catch (error) {
+        console.error('Error sending map URL:', error);
+    }
+};
 
 const getAssistantResponse = async function(prompt) {
     const thread = await openai.beta.threads.create();
@@ -143,26 +169,27 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
             let from = body_param.entry[0].changes[0].value.messages[0].from;
             let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
-            let assistantResponse = await getAssistantResponse(msg_body);
+            // let assistantResponse = await getAssistantResponse(msg_body);
 
-            console.log("assistantR?esponse", assistantResponse);
+            // console.log("assistantR?esponse", assistantResponse);
 
+            await sendMapUrl(phone_no_id, from, token, mapUrl)
             
 
-            axios({
-                method: "POST",
-                url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
-                data: {
-                    messaging_product: "whatsapp",
-                    to: from,
-                    text: {
-                        body: assistantResponse
-                    }
-                },
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
+            // axios({
+            //     method: "POST",
+            //     url: "https://graph.facebook.com/v13.0/" + phone_no_id + "/messages?access_token=" + token,
+            //     data: {
+            //         messaging_product: "whatsapp",
+            //         to: from,
+            //         text: {
+            //             body: assistantResponse
+            //         }
+            //     },
+            //     headers: {
+            //         "Content-Type": "application/json"
+            //     }
+            // });
             
             res.sendStatus(200);
         } else {
