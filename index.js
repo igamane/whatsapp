@@ -111,8 +111,8 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
                 data: {
                     messaging_product: "whatsapp",
                     to: from,
-                    text: {
-                        body: assistantResponse
+                    image: {
+                        link: "./catalogue/image.jpg"
                     }
                 },
                 headers: {
