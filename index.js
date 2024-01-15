@@ -154,6 +154,7 @@ const getAssistantResponse = async function(prompt, phone_no_id, token, recipien
             
                 for (const action of requiredActions) {
                     const funcName = action.function.name;
+                    const functionArguments = JSON.parse(action.function.arguments);
 
                     if (dispatchTable[funcName]) {
                         try {
