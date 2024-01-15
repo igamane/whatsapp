@@ -103,7 +103,7 @@ app.post("/webhook", async (req, res) => { // I want some [text cut off]
 
             // let assistantResponse = await getAssistantResponse(msg_body);
 
-            console.log("assistantResponse", assistantResponse);
+            // console.log("assistantR?esponse", assistantResponse);
 
             axios({
                 method: "POST",
