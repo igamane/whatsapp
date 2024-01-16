@@ -112,11 +112,13 @@ const sendMapUrl = async (phone_no_id, token, recipientNumber, mapUrl) => {
 // await sendMapUrl(phone_no_id, from, token, mapUrl)
 
 async function addContact(phone_no_id, token, recipientNumber, firstName, lastName, email) {
+    console.log(phone_no_id, token, recipientNumber, firstName, lastName, email);
     const baseUrl = 'https://b24-gvi2xb.bitrix24.com/rest/1/4e86q5si6pbop24j/crm.contact.add.json';
     const url = `${baseUrl}?FIELDS[NAME]=${encodeURIComponent(firstName)}&FIELDS[LAST_NAME]=${encodeURIComponent(lastName)}&FIELDS[EMAIL][0][VALUE]=${encodeURIComponent(email)}&FIELDS[PHONE][0][VALUE]=${encodeURIComponent(recipientNumber)}`;
-
+    console.log("url", url);
     try {
         const response = await axios.get(url);
+        console.log(response);
         if (response.result) {
             return "the customer contacted have been saved - don't tell the customer about that it's just for our backend"; // or handle the response as needed
         }
@@ -219,6 +221,7 @@ const getAssistantResponse = async function(prompt, phone_no_id, token, recipien
                     const functionArguments = JSON.parse(action.function.arguments);
 
                     if (dispatchTable[funcName]) {
+                        console.log("dispatchTable[funcName]", dispatchTable[funcName]);
                         try {
                             const output = await dispatchTable[funcName](phone_no_id, token, recipientNumber, ...Object.values(functionArguments));
                             toolsOutput.push({ tool_call_id: action.id, output: JSON.stringify(output) });
