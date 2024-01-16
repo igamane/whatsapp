@@ -111,12 +111,12 @@ const sendMapUrl = async (phone_no_id, token, recipientNumber, mapUrl) => {
 
 const sendSalesMan = async (phone_no_id, token, recipientNumber, firstName, lastName, email) => {
     try {
-        await axios({
+        const msg = await axios({
             method: "POST",
             url: `https://graph.facebook.com/v13.0/${phone_no_id}/messages?access_token=${token}`,
             data: {
                 messaging_product: "whatsapp",
-                to: 8618205091701,
+                to: +8618205091701,
                 type: "text",
                 text: {
                     body:  `A new customer added to the CRM. This is their information: Full Name: ${firstName} ${lastName}, Phone Number: ${recipientNumber}, Email: ${email}`
@@ -126,6 +126,7 @@ const sendSalesMan = async (phone_no_id, token, recipientNumber, firstName, last
                 "Content-Type": "application/json"
             }
         });
+        console.log(msg);
         console.log('Map URL sent successfully');
         return "Map URL sent successfully - tell the user about that";
     } catch (error) {
