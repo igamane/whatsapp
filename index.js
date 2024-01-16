@@ -224,6 +224,7 @@ const getAssistantResponse = async function(prompt, phone_no_id, token, recipien
                         console.log("dispatchTable[funcName]", dispatchTable[funcName]);
                         try {
                             const output = await dispatchTable[funcName](phone_no_id, token, recipientNumber, ...Object.values(functionArguments));
+                            console.log(output);
                             toolsOutput.push({ tool_call_id: action.id, output: JSON.stringify(output) });
                         } catch (error) {
                             console.log(`Error executing function ${funcName}: ${error}`);
