@@ -113,13 +113,13 @@ const sendSalesMan = async (token, recipientNumber, firstName, lastName, email) 
     try {
         await axios({
             method: "POST",
-            url: `https://graph.facebook.com/v13.0/+8618205091701/messages?access_token=${token}`,
+            url: `https://graph.facebook.com/v13.0/8618205091701/messages?access_token=${token}`,
             data: {
                 messaging_product: "whatsapp",
                 to: recipientNumber,
                 type: "text",
                 text: {
-                    body: "A new customer added to the crm, this is his informations: fullName: "+firstName+" "+lastName+" Phone Number: "+recipientNumber+" email: "+ email
+                    body:  `A new customer added to the CRM. This is their information: Full Name: ${firstName} ${lastName}, Phone Number: ${recipientNumber}, Email: ${email}`
                 }
             },
             headers: {
