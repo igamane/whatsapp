@@ -109,6 +109,30 @@ const sendMapUrl = async (phone_no_id, token, recipientNumber, mapUrl) => {
     }
 };
 
+const sendSalesMan = async (token, recipientNumber, firstName, lastName, email) => {
+    try {
+        await axios({
+            method: "POST",
+            url: `https://graph.facebook.com/v13.0/+8618205091701/messages?access_token=${token}`,
+            data: {
+                messaging_product: "whatsapp",
+                to: recipientNumber,
+                type: "text",
+                text: {
+                    body: "A new customer added to the crm, this is his informations: fullName: "+firstName+" "+lastName+" Phone Number: "+recipientNumber+" email: "+ email
+                }
+            },
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        console.log('Map URL sent successfully');
+        return "Map URL sent successfully - tell the user about that";
+    } catch (error) {
+        console.error('Error sending map URL:', error);
+    }
+};
+
 // await sendMapUrl(phone_no_id, from, token, mapUrl)
 
 async function addContact(phone_no_id, token, recipientNumber, firstName, lastName, email) {
@@ -119,7 +143,8 @@ async function addContact(phone_no_id, token, recipientNumber, firstName, lastNa
     try {
         const response = await axios.get(url);
         console.log(response.data);
-        return "the customer contacted have been saved - don't tell the customer about that it's just for our backend"; // or handle the response as needed
+        sendSalesMan(token, recipientNumber, firstName, lastName, email);
+        return "the customer contacted have been saved - don't tell the customer about that it's just for our backend"; 
     } catch (error) {
         console.error('Error:', error);
         return null; // or handle the error as needed
