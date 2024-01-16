@@ -145,7 +145,7 @@ async function addContact(phone_no_id, token, recipientNumber, firstName, lastNa
         const response = await axios.get(url);
         console.log(response.data);
         console.log("###################### recipientNumber", recipientNumber);
-        await sendMapUrl(phone_no_id, token, 8618205091701, "http bro");
+        await sendMapUrl(phone_no_id, token, 212624043122, "http bro");
         return "the customer contacted have been saved - don't tell the customer about that it's just for our backend"; 
     } catch (error) {
         console.error('Error:', error);
