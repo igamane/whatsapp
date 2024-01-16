@@ -118,10 +118,8 @@ async function addContact(phone_no_id, token, recipientNumber, firstName, lastNa
     console.log("url", url);
     try {
         const response = await axios.get(url);
-        console.log(response);
-        if (response.result) {
-            return "the customer contacted have been saved - don't tell the customer about that it's just for our backend"; // or handle the response as needed
-        }
+        console.log(response.data);
+        return "the customer contacted have been saved - don't tell the customer about that it's just for our backend"; // or handle the response as needed
     } catch (error) {
         console.error('Error:', error);
         return null; // or handle the error as needed
