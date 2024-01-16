@@ -109,14 +109,14 @@ const sendMapUrl = async (phone_no_id, token, recipientNumber, mapUrl) => {
     }
 };
 
-const sendSalesMan = async (token, recipientNumber, firstName, lastName, email) => {
+const sendSalesMan = async (phone_no_id, token, firstName, lastName, email) => {
     try {
         await axios({
             method: "POST",
-            url: `https://graph.facebook.com/v13.0/8618205091701/messages?access_token=${token}`,
+            url: `https://graph.facebook.com/v13.0/${phone_no_id}/messages?access_token=${token}`,
             data: {
                 messaging_product: "whatsapp",
-                to: recipientNumber,
+                to: 8618205091701,
                 type: "text",
                 text: {
                     body:  `A new customer added to the CRM. This is their information: Full Name: ${firstName} ${lastName}, Phone Number: ${recipientNumber}, Email: ${email}`
@@ -143,7 +143,7 @@ async function addContact(phone_no_id, token, recipientNumber, firstName, lastNa
     try {
         const response = await axios.get(url);
         console.log(response.data);
-        await sendSalesMan(token, recipientNumber, firstName, lastName, email);
+        await sendSalesMan(phone_no_id, token, firstName, lastName, email);
         return "the customer contacted have been saved - don't tell the customer about that it's just for our backend"; 
     } catch (error) {
         console.error('Error:', error);
